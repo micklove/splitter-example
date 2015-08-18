@@ -1,86 +1,86 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:int="http://www.springframework.org/schema/integration"
-	xmlns:int-file="http://www.springframework.org/schema/integration/file"
-	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
-	xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
-    xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
-    xsi:schemaLocation="
-	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/integration/ws
-	http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
-	http://www.springframework.org/schema/integration
-	http://www.springframework.org/schema/integration/spring-integration.xsd
-	http://www.springframework.org/schema/integration/stream
-	http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
-	http://www.springframework.org/schema/integration/file
-	http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
-	http://www.springframework.org/schema/integration/xml
-	http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd">
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<!--<beans xmlns="http://www.springframework.org/schema/beans"-->
+	<!--xmlns:int="http://www.springframework.org/schema/integration"-->
+	<!--xmlns:int-file="http://www.springframework.org/schema/integration/file"-->
+	<!--xmlns:int-mail="http://www.springframework.org/schema/integration/mail"-->
+	<!--xmlns:int-xml="http://www.springframework.org/schema/integration/xml"-->
+	<!--xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"-->
+    <!--xmlns:int-stream="http://www.springframework.org/schema/integration/stream"-->
+    <!--xmlns:int-ws="http://www.springframework.org/schema/integration/ws"-->
+    <!--xsi:schemaLocation="-->
+	<!--http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd-->
+	<!--http://www.springframework.org/schema/integration/ws-->
+	<!--http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd-->
+	<!--http://www.springframework.org/schema/integration-->
+	<!--http://www.springframework.org/schema/integration/spring-integration.xsd-->
+	<!--http://www.springframework.org/schema/integration/stream-->
+	<!--http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd-->
+	<!--http://www.springframework.org/schema/integration/file-->
+	<!--http://www.springframework.org/schema/integration/file/spring-integration-file.xsd-->
+	<!--http://www.springframework.org/schema/integration/xml-->
+	<!--http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd">-->
 
-	<!-- Read file from ./inbound directory -->
-	<int-file:inbound-channel-adapter id="producer-file-adapter"
-		channel="inboundChannel"
-        directory="file:inbound"
-		prevent-duplicates="true">
-		<int:poller fixed-rate="5000" />
-	</int-file:inbound-channel-adapter>
+	<!--&lt;!&ndash; Read file from ./inbound directory &ndash;&gt;-->
+	<!--<int-file:inbound-channel-adapter id="producer-file-adapter"-->
+		<!--channel="inboundChannel"-->
+        <!--directory="file:inbound"-->
+		<!--prevent-duplicates="true">-->
+		<!--<int:poller fixed-rate="5000" />-->
+	<!--</int-file:inbound-channel-adapter>-->
 
-	<int:channel id="inboundChannel" />
+	<!--<int:channel id="inboundChannel" />-->
 
-	<!-- convert file to string -->
-	<int-file:file-to-string-transformer
-		id="file-2-string-transformer"
-		input-channel="inboundChannel"
-		output-channel="xml-request-channel"
-		charset="UTF-8" />
+	<!--&lt;!&ndash; convert file to string &ndash;&gt;-->
+	<!--<int-file:file-to-string-transformer-->
+		<!--id="file-2-string-transformer"-->
+		<!--input-channel="inboundChannel"-->
+		<!--output-channel="xml-request-channel"-->
+		<!--charset="UTF-8" />-->
 
-	<int:channel id="xml-request-channel" />
+	<!--<int:channel id="xml-request-channel" />-->
 
-	<!-- Add the soap action as a header value -->
-	<int-ws:header-enricher input-channel="xml-request-channel"
-	                        output-channel="xml-enriched-header-request-channel">
-		<int-ws:soap-action value="http://ws.cdyne.com/WeatherWS/GetWeatherInformation" />
-	</int-ws:header-enricher>
+	<!--&lt;!&ndash; Add the soap action as a header value &ndash;&gt;-->
+	<!--<int-ws:header-enricher input-channel="xml-request-channel"-->
+	                        <!--output-channel="xml-enriched-header-request-channel">-->
+		<!--<int-ws:soap-action value="http://ws.cdyne.com/WeatherWS/GetWeatherInformation" />-->
+	<!--</int-ws:header-enricher>-->
 
-	<int:channel id="xml-enriched-header-request-channel" />
+	<!--<int:channel id="xml-enriched-header-request-channel" />-->
 
-	<!-- invoke the web service -->
-	<int-ws:outbound-gateway uri="http://wsf.cdyne.com/WeatherWS/Weather.asmx"
-	                         request-channel="xml-enriched-header-request-channel"
-	                         reply-channel="service-response-channel"/>
+	<!--&lt;!&ndash; invoke the web service &ndash;&gt;-->
+	<!--<int-ws:outbound-gateway uri="http://wsf.cdyne.com/WeatherWS/Weather.asmx"-->
+	                         <!--request-channel="xml-enriched-header-request-channel"-->
+	                         <!--reply-channel="service-response-channel"/>-->
 
-	<int:channel id="service-response-channel" />
+	<!--<int:channel id="service-response-channel" />-->
 
-	<!-- http://docs.spring.io/spring-integration/reference/html/xml.html#xml-xpath-splitting -->
-	<int-xml:xpath-expression id="refToXpathExpression"
-	                          ns-uri="http://ws.cdyne.com/WeatherWS/"
-	                          ns-prefix="mlo55"
-	                          expression="//mlo55:WeatherDescription"/>
+	<!--&lt;!&ndash; http://docs.spring.io/spring-integration/reference/html/xml.html#xml-xpath-splitting &ndash;&gt;-->
+	<!--<int-xml:xpath-expression id="refToXpathExpression"-->
+	                          <!--ns-uri="http://ws.cdyne.com/WeatherWS/"-->
+	                          <!--ns-prefix="mlo55"-->
+	                          <!--expression="//mlo55:WeatherDescription"/>-->
 
-	<!--
-		http://docs.spring.io/spring-integration/reference/html/xml.html#xml-xpath-splitting
-	-->
+	<!--&lt;!&ndash;-->
+		<!--http://docs.spring.io/spring-integration/reference/html/xml.html#xml-xpath-splitting-->
+	<!--&ndash;&gt;-->
 
-	<int-xml:xpath-splitter input-channel="service-response-channel"
-	                        output-channel="service-split-channel"
-	                        xpath-expression-ref="refToXpathExpression"/>
+	<!--<int-xml:xpath-splitter input-channel="service-response-channel"-->
+	                        <!--output-channel="service-split-channel"-->
+	                        <!--xpath-expression-ref="refToXpathExpression"/>-->
 
-	<int:channel id="service-split-channel"/>
+	<!--<int:channel id="service-split-channel"/>-->
 
-	<!-- Pretty print the response and dump it on another channel -->
-	<int:transformer input-channel="service-split-channel"
-					 output-channel="prettified-service-response-channel"
-					 expression="T(com.mlo55.utils.XMLUtils).formatXml(payload)"/>
+	<!--&lt;!&ndash; Pretty print the response and dump it on another channel &ndash;&gt;-->
+	<!--<int:transformer input-channel="service-split-channel"-->
+					 <!--output-channel="prettified-service-response-channel"-->
+					 <!--expression="T(com.mlo55.utils.XMLUtils).formatXml(payload)"/>-->
 
 
-	<int:channel id="prettified-service-response-channel" />
+	<!--<int:channel id="prettified-service-response-channel" />-->
 
-	<int-stream:stdout-channel-adapter id="stdout-consumer"
-	                                   channel="prettified-service-response-channel"
-	                                   append-newline="true" />
+	<!--<int-stream:stdout-channel-adapter id="stdout-consumer"-->
+	                                   <!--channel="prettified-service-response-channel"-->
+	                                   <!--append-newline="true" />-->
 
-</beans>
+<!--</beans>-->
 
