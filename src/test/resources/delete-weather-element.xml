@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--<WeatherDescription>-->
+<WeatherDescription xmlns="http://ws.cdyne.com/WeatherWS/">
+	<WeatherID>36</WeatherID>
+	<Description>Blah</Description>
+	<PictureURL>http://ws.cdyne.com/WeatherWS/Images/na.gif</PictureURL>
+</WeatherDescription>

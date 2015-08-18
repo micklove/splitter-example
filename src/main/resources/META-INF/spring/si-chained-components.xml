@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+	xmlns:int-xml="http://www.springframework.org/schema/integration/xml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:int-stream="http://www.springframework.org/schema/integration/stream"
+    xmlns:int-ws="http://www.springframework.org/schema/integration/ws"
+    xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/integration/ws
+	http://www.springframework.org/schema/integration/ws/spring-integration-ws.xsd
+	http://www.springframework.org/schema/integration
+	http://www.springframework.org/schema/integration/spring-integration.xsd
+	http://www.springframework.org/schema/integration/stream
+	http://www.springframework.org/schema/integration/stream/spring-integration-stream.xsd
+	http://www.springframework.org/schema/integration/file
+	http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+	http://www.springframework.org/schema/integration/xml
+	http://www.springframework.org/schema/integration/xml/spring-integration-xml.xsd">
+
+	<int-xml:xpath-expression id="refToXpathExpression"
+	                          ns-uri="http://ws.cdyne.com/WeatherWS/"
+	                          ns-prefix="mlo55"
+	                          expression="//mlo55:WeatherDescription"/>
+
+
+	<!-- Read file from ./inbound directory -->
+	<int-file:inbound-channel-adapter id="producer-file-adapter"
+	                                  channel="inboundChannel"
+	                                  directory="file:inbound"
+	                                  prevent-duplicates="true">
+		<int:poller fixed-rate="5000" />
+	</int-file:inbound-channel-adapter>
+
+
+	<!--
+			Read file containing xml,
+			convert to string,
+			send to web service,
+			pretty print the reply,
+			then send to standard out
+	-->
+	<int:chain input-channel="inboundChannel">
+
+		<!-- convert file to string -->
+		<int-file:file-to-string-transformer id="file-2-string-transformer" charset="UTF-8" />
+
+		<!-- Add the soap action as a header value -->
+		<int-ws:header-enricher>
+			<int-ws:soap-action value="http://ws.cdyne.com/WeatherWS/GetWeatherInformation" />
+		</int-ws:header-enricher>
+
+		<!-- invoke the web service -->
+		<int-ws:outbound-gateway uri="http://wsf.cdyne.com/WeatherWS/Weather.asmx" />
+
+		<!-- split -->
+		<int-xml:xpath-splitter xpath-expression-ref="refToXpathExpression"/>
+
+		<!-- pretty print -->
+		<int:transformer expression="T(com.mlo55.utils.XMLUtils).formatXml(payload)"/>
+
+		<!--<int-xml:xslt-transformer xsl-resource="get-element-name.xslt" />-->
+
+		<int-stream:stdout-channel-adapter append-newline="true" />
+
+	</int:chain>
+
+
+</beans>
+
