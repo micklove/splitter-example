@@ -61,7 +61,8 @@
 		<!-- pretty print -->
 		<int:transformer expression="T(com.mlo55.utils.XMLUtils).formatXml(payload)"/>
 
-		<!--<int-xml:xslt-transformer xsl-resource="get-element-name.xslt" />-->
+		<!-- For each split node, get the Description field, using a simple xslt -->
+		<int-xml:xslt-transformer xsl-resource="get-name-from-split-xml-response.xslt" />
 
 		<int-stream:stdout-channel-adapter append-newline="true" />
 
